@@ -1,0 +1,32 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    {% load static %}
+    <link rel="stylesheet" type="text/css" href="{% static 'bootstrap.min.css' %}">
+    <style>
+        a {
+            color: black;
+        }
+    </style>
+    <title>Document</title>
+</head>
+<body>
+{% comment %} html 파일을 통째로 넣을 경우 include 사용 {% endcomment %}
+{% include "navbar.html" %}
+{% comment %} 영역을 넣을 경우 block 사용 {% endcomment %}
+{% comment %} 기본 템플릿 안에 삽입될 내용 Start {% endcomment %}
+{% block content %}
+{% endblock %}
+{% comment %} 기본 템플릿 안에 삽입될 내용 End {% endcomment %}
+{% comment %} jQuery JS {% endcomment %}
+<script src="{% static 'jquery-3.7.1.min.js' %}"></script>
+{% comment %} Bootstrap JS {% endcomment %}
+<script src="{% static 'bootstrap.min.js' %}"></script>
+{% comment %} 자바스크립트 Start {% endcomment %}
+{% block script %}
+{% endblock %}
+{% comment %} 자바스크립트 End {% endcomment %}
+</body>
+</html>

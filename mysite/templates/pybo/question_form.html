@@ -1,0 +1,34 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+    <h5 class="my-3 border-bottom pb-2">질문 등록</h5>
+    <form method="post" class="post-form my-3">
+        {% csrf_token %}
+        {% comment %} 오류 표시 Start {% endcomment %}
+        {% comment %} ↓ 에러가 발생하면 div 로 css 표현해줄거야 {% endcomment %}
+        {% if form.errors %}
+            <div class="alert alert-danger" role="alert"> {% comment %} 경고의 규칙을 가지고 있음을 표시 {% endcomment %}
+                {% for field in form %}
+                    {% if field.errors %}
+                    <strong>{{ field.label }}</strong> {% comment %} subject로 등록된 label(제목) 가져와 {% endcomment %}
+                    {{ field.errors }} {% comment %} field로 발생된 에러 p태그로 가져와 {% endcomment %}
+                    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+        {% comment %} 오류 표시 End {% endcomment %}
+        <div class="form-group">
+            <label for="subject">제목</label>
+            <input type="text" id="subject" name="subject" class="form-control"
+                    value="{{ form.subject.value|default_if_none:''}}"> {% comment %} |default_if_none:'' >> 오류 발생시 입력값 유지하기 위함 {% endcomment %}
+        </div>
+        <div class="form-group">
+            <label for="content">내용</label>
+            <textarea type="text" id="content" name="content" class="form-control"
+                     rows="10"> {{ form.content.value|default_if_none:''}}</textarea>
+        </div>
+        <button type="submit" class="btn btn-primary">저장하기</button>
+    </form>
+</div>
+{% endblock %}
+

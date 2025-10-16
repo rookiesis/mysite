@@ -1,0 +1,34 @@
+<!--comment
+class
+navbar: 내비게이션 기본 스타일 지정
+navbar-expand-lg: 화면이 Large(992px) 사이즈 이상인 경우 메뉴바 펼치기
+                Large보다 작은 경우 토글로 접어서 보여줌
+navbar-light: 글자색 밝게 지정
+bg-light: 밝은 회색 배경 지정
+border-bottom: 내비게이션바 밑에 밑줄 추가
+data-toggle: 버튼 클릭시 collapse를 트리거
+data-target: 열고 닫힘 기능(<div id=navbarNav></div>)
+aria-*: 스크린 속성 지정
+endcomment-->
+<nav class="navbar navbar-expand-lg navbar-light bg-light border-bottom">
+    <a class="navbar-brand" href={% url 'pybo:index' %}>Pybo</a>
+    <button class="navbar-toggler ml-auto" type="button" data-toggle="collapse"
+            data-target="#navbarNav" aria-controls="navbarNav"
+            aria-expanded="false" aria-label="Toggle Navigation">
+        <span class="navbar-toggler-icon"></span>
+    </button>
+    <div class="collapse navbar-collapse flex-grow-0" id="navbarNav">
+        <ul class="navbar-nav">
+            <li class="nav-item ">
+                {% if user.is_authenticated %}
+                <form method="post" class="nav-link" action="{% url 'common:logout' %}">
+                    {% csrf_token %}
+                    <button type="submit" class="btn btn-primary">{{ user.username }}(로그아웃)</button>
+                </form>
+                {% else %}
+                <a class="nav-link" href="{% url 'common:login' %}">로그인</a>
+                {% endif%}
+            </li>
+        </ul>
+    </div>
+</nav>
