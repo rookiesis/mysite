@@ -1,4 +1,5 @@
 from django.db import models
+from django.conf import settings
 from common.models import CustomUser
 
 # Create your models here.
@@ -11,7 +12,7 @@ class Base(models.Model):
     voter = models.ManyToManyField(CustomUser, related_name="%(class)s_voter") # 해당 클래스의 voter
 
     class Meta:
-         abstract = True
+        abstract = True
 
     def __str__(self):
         return self.subject
