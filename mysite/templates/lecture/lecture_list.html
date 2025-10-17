@@ -90,7 +90,7 @@
         {% endif %}
     </ul>
     {% comment %} 페이징 처리 끝 {% endcomment %}
-    <a href="{% url 'lecture:lecture_create' %}" class="btn btn-primary">질문 등록하기</a>
+    <a href="{% url 'lecture:lecture_create' %}" class="btn btn-primary">강의 신청하기</a>
 </div>
 <form id="searchForm" method="get" action="{% url 'index' %}">
     <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}">
