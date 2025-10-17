@@ -33,7 +33,7 @@ def question_modify(request, question_id):
     if request.user != question.author:
         return Response({"detail": "수정권한이 없습니다."}, status=403)
         
-    serializer = QuestionSerializer(Question, data = request.data, partial = True) # 변경이 일어나는 부분에 대해서만
+    serializer = QuestionSerializer(question, data = request.data, partial = True) # 변경이 일어나는 부분에 대해서만
     if serializer.is_valid():
         serializer.save(modify_date = timezone.now())
         return Response(serializer.data)
