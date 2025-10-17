@@ -1,12 +1,14 @@
 from django.urls import path
 # from . import views -> .은 pybo, views는 폴더
 from .views import base_views, question_views, answer_views, comment_views, vote_views
+# from lecture.views import base_views
+
 
 app_name = "pybo"
 
 urlpatterns = [
     # base_views.py
-    path('', base_views.index, name='index'), # 127.0.0.1:8000/pybo/
+    path('', base_views.index, name='index'), # 127.0.0.1:8000/pybo/ -> 강의 페이지로 이동
     path('<int:question_id>/', base_views.detail, name='detail'), # 127.0.0.1:8000/pybo/3 -> question_id = 3
     # question_views.py
     path('question/create/', question_views.question_create, name="question_create"),

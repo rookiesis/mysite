@@ -106,7 +106,7 @@ def comment_modify_answer(request, comment_id):
         else:
             form = CommentForm(instance=comment)
         context = {'form': form}
-        return render(request, 'pybocomment_form.html', context)
+        return render(request, 'pybo/comment_form.html', context)
 
 @login_required(login_url='common:login')
 def comment_delete_answer(request, comment_id):

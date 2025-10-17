@@ -32,43 +32,13 @@ def answer_create(request, question_id):
                 resolve_url('pybo:detail', question_id=question.id), answer.id))
     else:
         form = AnswerForm()
-
-    page = request.GET.get('page', '1')     # 페이지
-    kw = request.GET.get('kw', '')          # 검색어
-    so = request.GET.get('so', 'recent')    # 정렬 기준
-
-    if so == 'recommend':
-        answer_list = Question.answer_set.annotate(
-            num_voter=Count('voter')).order_by('-num_voter', '-create_date')
-    elif so == 'popular':
-        answer_list = Question.answer_set.annotate(
-            num_answer=Count('answer')).order_by('-num_answer', '-create_date')
-    else: # recent
-        answer_list = Question.answer_set.order_by('-create_date')
-
-    if kw:
-        answer_list = answer_list.filter(
-            Q(content__icontains=kw) |
-            Q(author__username__icontains=kw)
-        ).distinct() # 중복 제거
-
-    paginator = Paginator(answer_list, 5)
-    page_obj = paginator.get_page(page)
-
-    current_page = page_obj.number
-    start_index = max(current_page -5, 1)
-    end_index = min(current_page +5, paginator.num_pages)
-    page_range = range(start_index, end_index + 1)
-
     context = {
         'question': question,
-        'form': form,
-        'page_range': page_range,
-        'page': page_obj,
-        'kw': kw,
-        'so': so
+        'form': form,          
     }
+
     return render(request, 'pybo/question_detail.html', context)
+
 
 @login_required(login_url='common:login')
 def answer_modify(request, answer_id):

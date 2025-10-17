@@ -12,15 +12,77 @@
     {% endfor %}
     </div>
     {% endif %}
+
     <h2 class="border-bottom py-2">{{ question.subject }}</h2>
-    <div class="row justify-content-between my-3">
-        <div class="col-2">
-            <select class="form-control so">
-                <option value="recent" {% if so == 'recent' %}selected{% endif %}>최신순</option>
-                <option value="recommend" {% if so == 'recommend' %}selected{% endif %}>추천순</option>
-                <option value="old" {% if so == 'old' %}selected{% endif %}>오래된순</option>
-            </select>
+        <div class=row my-3>
+            <div class="col-1"> {% comment %} 추천 영역 {% endcomment %}
+                <div class="bg-light text-center p-3 border font-weight-bolder mb-1">
+                    {{question.voter.count}}</div>
+                <a href="#" data-uri="{% url 'pybo:vote_question' question.id %}"
+                {% comment %} 추천 버튼을 누르는 이벤트를 얻기 위한 클래스 {% endcomment %}
+                class="recommend btn btn-sm btn-secondary btn-block my-1">추천</a>
+            </div>
+            <div class="col-11"> {% comment %} 질문 영역 {% endcomment %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-text" style="white-space: pre-line;">{{ question.content|mark }}</div>
+                        <div class="d-flex justify-content-end">
+                            {% if question.modify_date %}
+                            <div class="badge badge-light p-2 text-left mx-3">
+                                <div class="mb-2">modified at</div>
+                                <div>{{ question.modify_date }}</div>
+                            </div>
+                            {% endif %}
+                            <div class="badge badge-light p-2 text-left">
+                                <div class="mb-2">{{ question.author.username }}</div>
+                                <div>{{ question.create_date }}</div>
+                            </div>
+                        </div>
+                        {% if request.user == question.author %}
+                        <div class="my-3">
+                            <a href="{% url 'pybo:question_modify' question.id %}" class="btn btn-sm btn-outline-secondary">수정</a>
+                            <a href="#" class="delete btn btn-sm btn-outline-secondary"
+                                data-uri="{% url 'pybo:question_delete' question.id %}">삭제</a>
+                        </div>
+                        {% endif %}
+
+                        {% comment %} 질문 댓글 Start {% endcomment %}
+                        {% if question.comment_set.count > 0 %}
+                        <div class="mt-3">
+                        {% for comment in question.comment_set.all %}
+                            <a name="comment_{{ comment.id }}"></a>
+                            <div class="comment py-2 text-muted">
+                                <span style="white-space: pre-line;">{{ comment.content }}</span>
+                                <span>
+                                    - {{ comment.author }}, {{ comment.create_date }}
+                                    {% if comment.modify_date %}
+                                    (수정:{{ comment.modify_date }})
+                                    {% endif %}
+                                </span>
+                                {% if request.user == comment.author %}
+                                <a href="{% url 'pybo:comment_modify_question' comment.id %}" class="small">수정</a>
+                                <a href="#" class="small delete" data-uri="{% url 'pybo:comment_delete_question' comment.id %}">삭제</a>
+                                {% endif %}
+                            </div>
+                            {% endfor %}
+                        <div>
+                        {% endif %}
+                        <div>
+                            <a href="{% url 'pybo:comment_create_question' question.id %}"><small>댓글 추가 ..</small></a>
+                        </div>
+                        {% comment %} 질문 댓글 End {% endcomment %}
+                    </div>
+                </div>
+            </div>
         </div>
+        <div class="row justify-content-between my-3">
+            <div class="col-2">
+                <select class="form-control so">
+                    <option value="recent" {% if so == 'recent' %}selected{% endif %}>최신순</option>
+                    <option value="recommend" {% if so == 'recommend' %}selected{% endif %}>추천순</option>
+                    <option value="old" {% if so == 'old' %}selected{% endif %}>오래된순</option>
+                </select>
+            </div>
         <div class="col-4 input-group">
             <input type="text" class="form-control kw" value="{{ kw|default_if_none:'' }}">
             <div class="input-group-append">
@@ -28,102 +90,9 @@
             </div>
         </div>
     </div>
-    <div class=row my-3>
-        <div class="col-1"> {% comment %} 추천 영역 {% endcomment %}
-            <div class="bg-light text-center p-3 border font-weight-bolder mb-1">
-                {{question.voter.count}}</div>
-            <a href="#" data-uri="{% url 'pybo:vote_question' question.id %}"
-            {% comment %} 추천 버튼을 누르는 이벤트를 얻기 위한 클래스 {% endcomment %}
-            class="recommend btn btn-sm btn-secondary btn-block my-1">추천</a>
-        </div>
-        <div class="col-11"> {% comment %} 질문 영역 {% endcomment %}
-            <div class="card">
-                <div class="card-body">
-                    <div class="card-text" style="white-space: pre-line;">{{ question.content|mark }}</div>
-                    <div class="d-flex justify-content-end">
-                        {% if question.modify_date %}
-                        <div class="badge badge-light p-2 text-left mx-3">
-                            <div class="mb-2">modified at</div>
-                            <div>{{ question.modify_date }}</div>
-                        </div>
-                        {% endif %}
-                        <div class="badge badge-light p-2 text-left">
-                            <div class="mb-2">{{ question.author.username }}</div>
-                            <div>{{ question.create_date }}</div>
-                        </div>
-                    </div>
-                    {% if request.user == question.author %}
-                    <div class="my-3">
-                        <a href="{% url 'pybo:question_modify' question.id %}" class="btn btn-sm btn-outline-secondary">수정</a>
-                        <a href="#" class="delete btn btn-sm btn-outline-secondary"
-                            data-uri="{% url 'pybo:question_delete' question.id %}">삭제</a>
-                    </div>
-                    {% endif %}
-                    {% comment %} 질문 댓글 Start {% endcomment %}
-                    {% if question.comment_set.count > 0 %}
-                    <div class="mt-3">
-                    {% for comment in question.comment_set.all %}
-                        <a name="comment_{{ comment.id }}"></a>
-                        <div class="comment py-2 text-muted">
-                            <span style="white-space: pre-line;">{{ comment.content }}</span>
-                            <span>
-                                - {{ comment.author }}, {{ comment.create_date }}
-                                {% if comment.modify_date %}
-                                (수정:{{ comment.modify_date }})
-                                {% endif %}
-                            </span>
-                            {% if request.user == comment.author %}
-                            <a href="{% url 'pybo:comment_modify_question' comment.id %}" class="small">수정</a>
-                            <a href="#" class="small delete" data-uri="{% url 'pybo:comment_delete_question' comment.id %}">삭제</a>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    <div>
-                    {% endif %}
-                    <div>
-                        <a href="{% url 'pybo:comment_create_question' question.id %}" class="small"><small>댓글 추가 ..</small></a>
-                    </div>
-                    {% comment %} 질문 댓글 End {% endcomment %}
-                </div>
-            </div>
-        </div>
-    </div>
-    <ul class="pagination justify-content-center">
-        {% comment %} 이전 페이지 {% endcomment %}
-        {% if answer_list.has_previous %}
-        <li class="page-item">
-            <a class="page-link" data-page="{{ answer_list.previous_page_number }}" href="#">이전</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <a class="page-link" tabindex="-1" aria-disabled="true" href="#">이전</a>
-        </li>
-        {% endif %}
-        {% comment %} 페이지 리스트 {% endcomment %}
-        {% for num in page_range %}
-            {% if num == answer_list.number %}
-            <li class="page-item active" aria-current="page">
-                <a class="page-link" data-page="{{ num }}" href="#">{{ num }}</a>
-            </li>
-            {% else %}
-            <li class="page-item">
-                <a class="page-link" data-page="{{ num }}" href="#">{{ num }}</a>
-            </li>
-            {% endif %}
-        {% endfor %}
-        {% comment %} 다음 페이지 {% endcomment %}
-        {% if answer_list.has_next %}
-        <li class="page-item">
-            <a class="page-link" data-page="{{ answer_list.next_page_number }}" href="#">다음</a>
-        </li>
-        {% else %}
-        <li class="page-item disabled">
-            <a class="page-link" tabindex="-1" aria-disabled="true" href="#">다음</a>
-        </li>
-        {% endif %}
-    </ul>
+
     <h5 class="border-bottom my-3 py-2">{{question.answer_set.count}}개의 답변이 있습니다.</h5>
-    {% for answer in question.answer_set.all %}
+    {% for answer in answer_list %}
     <a name="answer_{{ answer.id }}"></a>
     <div class="row my-3">
         <div class="col-1"> {% comment %} 추천 영역 {% endcomment %}
@@ -146,43 +115,58 @@
                             <div>{{ answer.create_date }}</div>
                         </div>
                     </div>
+                    
                     {% if request.user == answer.author %}
                     <div class="my-3">
                         <a href="{% url 'pybo:answer_modify' answer.id %}" class="btn btn-sm btn-outline-secondary">수정</a>
                         <a href="#" class="delete btn btn-sm btn-outline-secondary" data-uri="{% url 'pybo:answer_delete' answer.id %}">삭제</a>
                     </div>
                     {% endif %}
-                    {% comment %} 답변 댓글 Start {% endcomment %}
-                    {% if answer.comment_set.count > 0 %}
-                    <div class="mt-3">
-                    {% for comment in answer.comment_set.all %}
-                    <a name="comment_{{ comment.id }}"></a>
-                        <div class="comment py-2 text-muted">
-                            <span style="white-space: pre-line;">{{ comment.content }}</span>
-                            <span>
-                                - {{ comment.author }}, {{ comment.create_date }}
-                                {% if comment.modify_date %}
-                                (수정:{{ comment.modify_date }})
-                                {% endif %}
-                            </span>
-                            {% if request.user == comment.author %}
-                            <a href="{% url 'pybo:comment_modify_answer' comment.id %}" class="small">수정</a>
-                            <a href="#" class="small delete" data-uri="{% url 'pybo:comment_delete_answer' comment.id %}">삭제</a>
-                            {% endif %}
-                        </div>
-                    {% endfor %}
-                    </div>
-                    {% endif %}
-                    <div>
-                        <a href="{% url 'pybo:comment_create_answer' answer.id %}"><small>댓글 추가 ..</small></a>
-                    </div>
-                    {% comment %} 답변 댓글 End {% endcomment %}
                 </div>
             </div>
         </div>
     </div>
+    {% empty %}
+    <p class="text-center text-muted">등록된 답변이 없습니다.</p>
     {% endfor %}
-    <form action="{% url 'pybo:answer_create' question.id %}" method="post" class="my-3">
+
+    <ul class="pagination justify-content-center">
+        {% comment %} 이전 페이지 {% endcomment %}
+        {% if answer_list.has_previous %}
+        <li class="page-item">
+            <a class="page-link" data-page="{{ answer_list.previous_page_number }}" href="#">이전</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#">이전</a>
+        </li>
+        {% endif %}
+        {% comment %} 페이지 리스트 {% endcomment %}
+        {% for num in page_range %}
+            {% if num == answer_list.number %}
+            <li class="page-item active">
+                <a class="page-link" href="#">{{ num }}</a>
+            </li>
+            {% else %}
+            <li class="page-item">
+                <a class="page-link" data-page="{{ num }}" href="#">{{ num }}</a>
+            </li>
+            {% endif %}
+        {% endfor %}
+
+        {% comment %} 다음 페이지 {% endcomment %}
+        {% if answer_list.has_next %}
+        <li class="page-item">
+            <a class="page-link" data-page="{{ answer_list.next_page_number }}" href="#">다음</a>
+        </li>
+        {% else %}
+        <li class="page-item disabled">
+            <a class="page-link" href="#">다음</a>
+        </li>
+        {% endif %}
+    </ul>
+
+        <form action="{% url 'pybo:answer_create' question.id %}" method="post" class="my-3">
         {% csrf_token %}
         {% if form.errors %}
         <div class="alert alert-danger" role="alert">
@@ -200,6 +184,7 @@
         </div>
         <input type="submit" value="답변등록" class="btn btn-primary">
     </form>
+
     <form id="searchForm" method="get" action="{% url 'pybo:detail' question.id %}">
         <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}">
         <input type="hidden" id="page" name="page" value="{{ page }}">
@@ -216,9 +201,44 @@ $(document).ready(function(){
             location.href = $(this).data('uri');
         }
     });
+
     $(".recommend").on('click', function() {
         if(confirm("정말로 추천하시겠습니까?")) {
             location.href = $(this).data('uri');
+        }
+    });
+
+    $(".page-link").on('click', function() {
+        $("#page").val($(this).data("page"));
+        $("#searchForm").submit();
+    });
+
+    $(".so").on('change', function() {
+        $("#so").val($(this).val());
+        $("#searchForm").submit();
+    });
+
+    $("#btn_search").on('click', function() {
+        $("#kw").val($(".kw").val());
+        $("#page").val(1);
+        $("#searchForm").submit();
+    });
+
+    $(".kw").on('keyup', function(e) {
+        if (e.key === 'Enter') {
+            $("#kw").val($(this).val());
+            $("#page").val(1);
+            $("#searchForm").submit();
+        }
+    });
+
+    {% comment %} 엔터키로 검색 가능하도록 {% endcomment %}
+    $(".kw").on('keypress', function(e) {
+        if (e.which == 13) {
+            e.preventDefault();
+            $("#kw").val($(".kw").val());
+            $("#page").val(1);
+            $("#searchForm").submit();
         }
     });
 });

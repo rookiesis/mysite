@@ -16,11 +16,22 @@ Including another URLconf
 """
 from django.contrib import admin
 from django.urls import path, include
-from pybo.views import base_views
+from lecture.views import base_views
+from rest_framework_simplejwt.views import (
+    TokenObtainPairView,
+    TokenRefreshView
+)
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('pybo/', include('pybo.urls')),
     path('common/', include('common.urls')),
     path('', base_views.index, name='index'), # '/' 에 해당되는 path
+    path('lecture/', include('lecture.urls')),
+]
+
+urlpatterns += [
+    path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', TokenObtainPairView.as_view(), name='token_refresh'), # 갱신을 위함
+    
 ]

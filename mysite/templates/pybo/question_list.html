@@ -72,12 +72,13 @@
         {% for page_number in question_list.paginator.page_range %}
         {% if page_number >= question_list.number|add:-5 and page_number <= question_list.number|add:5 %}
             {% if page_number == question_list.number %}
-            <li class="page-item active" aria-current="page">
-                <a class="page-link" data-page="{{ num }}" href="#">{{ num }}</a>
+            {% comment %} active: 강조표시 {% endcomment %}
+            <li class="page-item active" aria-current="page"> 
+                <a class="page-link" data-page="{{ page_number }}" href="#">{{ page_number }}</a>
             </li>
             {% else %}
             <li class="page-item">
-                <a class="page-link" data-page="{{ num }}" href="#">{{ num }}</a>
+                <a class="page-link" data-page="{{ page_number }}" href="#">{{ page_number }}</a>
             </li>
             {% endif %}
         {% endif %}

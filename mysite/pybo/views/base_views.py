@@ -1,9 +1,12 @@
 # 기본 관리
-
-from django.core.paginator import Paginator
 from django.shortcuts import render, get_object_or_404
 
-from pybo.models import Question
+# Paginator 불러오기
+# 페이징 기능을 담당하는 클래스
+# Paginator는 쿼리셋(혹은 리스트)를 받아서 페이지 단위로 나누는 역할
+from django.core.paginator import Paginator
+
+from pybo.models import Question, Answer
 from django.db.models import Q, Count
 
 def index(request):
@@ -67,7 +70,7 @@ def index(request):
 
     context = {
         'question_list': page_obj,
-        # 'page_range': page_range,
+        'page_range': page_range,
         'page': page,
         'kw': kw,
         'so': so
@@ -79,5 +82,40 @@ def detail(request, question_id):
     pybo 내용 출력
     """
     question = get_object_or_404(Question, pk=question_id) # pk는 id와 동일
-    context = {'question': question}
+
+    page = request.GET.get('page', '1')     # 페이지
+    kw = request.GET.get('kw', '')          # 검색어
+    so = request.GET.get('so', 'recent')    # 정렬 기준
+
+    # 정렬
+    if so == 'recommend':
+        answer_list = question.answer_set.annotate(num_voter=Count('voter')).order_by('-num_voter', '-create_date')
+    elif so == 'old':
+        answer_list = question.answer_set.order_by('create_date')
+    else: # recent
+        answer_list = question.answer_set.order_by('-create_date')
+
+     # 조회
+    if kw:
+        answer_list = answer_list.filter(
+            Q(content__icontains=kw) |          # 내용검색
+            Q(author__username__icontains=kw)   # 질문 글쓴이 검색
+        ).distinct() # 중복 제거
+
+    paginator = Paginator(answer_list, 5)
+    page_obj = paginator.get_page(page)
+
+    current_page = page_obj.number
+    start_index = max(current_page -5, 1)
+    end_index = min(current_page +5, paginator.num_pages)
+    page_range = range(start_index, end_index + 1)
+
+    context = {
+        'question': question,
+        'answer_list': page_obj,
+        'page_range': page_range,
+        'page': page,
+        'kw': kw,
+        'so': so
+    }
     return render(request, 'pybo/question_detail.html', context)

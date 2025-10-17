@@ -2,16 +2,25 @@ from django.db import models
 from common.models import CustomUser
 
 # Create your models here.
-class Question(models.Model):
-    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='author_question')
+class Base(models.Model):
+    author = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     subject = models.CharField(max_length=200)
     content = models.TextField() # null=True: 공백 허용
     create_date = models.DateTimeField()
     modify_date = models.DateTimeField(null=True, blank=True)
-    voter = models.ManyToManyField(CustomUser, related_name='voter_question') # voter 추가
+    voter = models.ManyToManyField(CustomUser, related_name="%(class)s_voter") # 해당 클래스의 voter
+
+    class Meta:
+         abstract = True
 
     def __str__(self):
-        return self.subject # question 호출하면 object(1)대신 subject 이름 나오게 하기
+        return self.subject
+
+class Question(Base):
+    pass
+
+class Lecture(Base):
+    pass
 
 class Answer(models.Model):
     author = models.ForeignKey(CustomUser, on_delete=models.CASCADE, related_name='author_answer')

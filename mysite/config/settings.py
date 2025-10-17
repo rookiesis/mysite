@@ -32,6 +32,7 @@ ALLOWED_HOSTS = ["*"]
 # Application definition
 
 INSTALLED_APPS = [
+    'lecture.apps.LectureConfig',
     'common.apps.CommonConfig',
     'pybo.apps.PyboConfig',
     'django.contrib.admin',

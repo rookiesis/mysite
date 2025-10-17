@@ -1,0 +1,100 @@
+{% extends 'base.html' %}
+{% load pybo_filter %}
+{% block content %}
+
+<div class="container my-3">
+    {% comment %} 사용자 오류 표시 {% endcomment %}
+    {% if messages %}
+    <div class="alert alert-danger my-3" role="alert">
+    {% for message in messages %}
+        <strong>{{ message.tags }}</strong>
+        <ul><li>{{ message.message }}</li></ul>
+    {% endfor %}
+    </div>
+    {% endif %}
+
+    <h2 class="border-bottom py-2">{{ question.subject }}</h2>
+        <div class=row my-3>
+            <div class="col-1"> {% comment %} 추천 영역 {% endcomment %}
+                <div class="bg-light text-center p-3 border font-weight-bolder mb-1">
+                    {{question.voter.count}}</div>
+                <a href="#" data-uri="{% url 'pybo:vote_question' question.id %}"
+                {% comment %} 추천 버튼을 누르는 이벤트를 얻기 위한 클래스 {% endcomment %}
+                class="recommend btn btn-sm btn-secondary btn-block my-1">추천</a>
+            </div>
+            <div class="col-11"> {% comment %} 질문 영역 {% endcomment %}
+                <div class="card">
+                    <div class="card-body">
+                        <div class="card-text" style="white-space: pre-line;">{{ question.content|mark }}</div>
+                        <div class="d-flex justify-content-end">
+                            {% if question.modify_date %}
+                            <div class="badge badge-light p-2 text-left mx-3">
+                                <div class="mb-2">modified at</div>
+                                <div>{{ question.modify_date }}</div>
+                            </div>
+                            {% endif %}
+                            <div class="badge badge-light p-2 text-left">
+                                <div class="mb-2">{{ question.author.username }}</div>
+                                <div>{{ question.create_date }}</div>
+                            </div>
+                        </div>
+                        {% if request.user == question.author %}
+                        <div class="my-3">
+                            <a href="{% url 'pybo:question_modify' question.id %}" class="btn btn-sm btn-outline-secondary">수정</a>
+                            <a href="#" class="delete btn btn-sm btn-outline-secondary"
+                                data-uri="{% url 'pybo:question_delete' question.id %}">삭제</a>
+                        </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+        <div class="row justify-content-between my-3">
+            <div class="col-2">
+                <select class="form-control so">
+                    <option value="recent" {% if so == 'recent' %}selected{% endif %}>최신순</option>
+                    <option value="recommend" {% if so == 'recommend' %}selected{% endif %}>추천순</option>
+                    <option value="old" {% if so == 'old' %}selected{% endif %}>오래된순</option>
+                </select>
+            </div>
+        <div class="col-4 input-group">
+            <input type="text" class="form-control kw" value="{{ kw|default_if_none:'' }}">
+            <div class="input-group-append">
+                <button class="btn btn-outline-secondary" type="button" id="btn_search">찾기</button>
+            </div>
+        </div>
+    </div>
+    <form id="searchForm" method="get" action="{% url 'pybo:detail' question.id %}">
+        <input type="hidden" id="kw" name="kw" value="{{ kw|default_if_none:'' }}">
+        <input type="hidden" id="page" name="page" value="{{ page }}">
+        <input type="hidden" id="so" name="so" value="{{ so }}">
+    </form>
+</div>
+{% endblock %}
+{% block script %}
+<script type='text/javascript'>
+$(document).ready(function(){
+    $(".delete").on('click', function() {
+        if(confirm("정말로 삭제하시겠습니까??")) {
+            location.href = $(this).data('uri');
+        }
+    });
+
+    $(".recommend").on('click', function() {
+        if(confirm("정말로 추천하시겠습니까?")) {
+            location.href = $(this).data('uri');
+        }
+    });
+
+    {% comment %} 엔터키로 검색 가능하도록 {% endcomment %}
+    $(".kw").on('keypress', function(e) {
+        if (e.which == 13) {
+            e.preventDefault();
+            $("#kw").val($(".kw").val());
+            $("#page").val(1);
+            $("#searchForm").submit();
+        }
+    });
+});
+</script>
+{% endblock %}
