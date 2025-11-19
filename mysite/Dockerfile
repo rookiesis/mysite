@@ -3,7 +3,6 @@ FROM python:3.11-slim
 
 # 작업 디렉토리 설정
 WORKDIR /app
-RUN python manage.py collectstatic --noinput
 
 # requirements.txt 복사 및 의존성 설치
 COPY requirements.txt .
@@ -11,6 +10,8 @@ RUN pip install --no-cache-dir -r requirements.txt
 
 # 프로젝트 전체 복사
 COPY . .
+
+RUN python manage.py collectstatic --noinput
 
 # 컨테이너 포트 8000 노출
 EXPOSE 8000
