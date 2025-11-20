@@ -57,8 +57,7 @@ pipeline {
                     }
 
                     sh """
-                    sed -i "s|image: hpark8672/django-app:.*|image: hpark8672/django-app:${BUILD_NUMBER}|" django/django-node1-deploy.yml
-                    sed -i "s|image: hpark8672/django-app:.*|image: hpark8672/django-app:${BUILD_NUMBER}|" django/django-node2-deploy.yml
+                    sed -i "s|image: hpark8672/django-app:.*|image: hpark8672/django-app:${BUILD_NUMBER}|" django-app/django-deployment.yml
                     """
 
                     withCredentials([usernamePassword(
@@ -70,7 +69,7 @@ pipeline {
                         git config user.name "rookiesis"
                         git config user.email "hpark8672@gmail.com"
 
-                        git add django/django-node1-deploy.yml django/django-node2-deploy.yml || true
+                        git add django-app/django-deployment || true
                         git commit -m "Update Django image to build ${BUILD_NUMBER}" || true
 
                         git remote set-url origin https://${GIT_USER}:${GIT_TOKEN}@github.com/rookiesis/k8s-manifest.git
